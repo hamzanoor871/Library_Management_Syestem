@@ -20,4 +20,27 @@ struct Book {
         printf("Enter your choice: ");
         scanf("%d", &choice);
 
+switch(choice){
+
+    case 1:
+      case 1:
+    printf("Enter Book ID: ");
+    scanf("%d", &books[count].id);
+
+    printf("Enter Book Name: ");
+    scanf(" %99[^\n]", books[count].title);
+
+    printf("Enter Author Name: ");
+    scanf(" %99[^\n]", books[count].author);
+
+    printf("Enter Quantity: ");
+    scanf("%d", &books[count].quantity);
+
+    count++;
+
+    printf("Book added successfully!\n");
+    break;
+    
+    
+
 }
