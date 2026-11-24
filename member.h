@@ -4,5 +4,7 @@
 void addMember(void);
 void viewMembers(void);
 void searchMember(void);
+void updateMember(void);
+void deleteMember(void);
 
 #endif
