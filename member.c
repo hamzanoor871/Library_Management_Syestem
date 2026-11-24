@@ -1,8 +1,15 @@
 #include <stdio.h>
 #include <string.h>
-#include "library.h"
-#include "member.h"
+#define MAX_MEMBERS 100
 
+typedef struct
+{
+    int id;
+    char name[50];
+    char contact[20];
+    int active;
+} Member;
+int hasIssuedBooks(int id);
 Member members[MAX_MEMBERS];
 int memberCount = 0;
 
@@ -12,6 +19,11 @@ int findMemberIndex(int id) {
         if (members[i].active && members[i].id == id) return i;
     }
     return -1;
+}
+
+int hasMember(int id)
+{
+    return findMemberIndex(id) != -1;
 }
 
 static void readLine(char text[], int size) {
@@ -98,7 +110,7 @@ void updateMember(void) {
     printf("Member updated successfully.\n");
 }
 void deleteMember(void) {
-    int id, index, i;
+    int id, index;
 
     printf("Enter member ID to delete: ");
 
@@ -115,16 +127,63 @@ void deleteMember(void) {
         return;
     }
 
-    for (i = 0; i < issueCount; i++) {
-        if (issues[i].active &&
-            issues[i].memberId == id) {
-
-            printf("Cannot delete: member has an issued book.\n");
-            return;
-        }
-    }
+   if (hasIssuedBooks(id))
+{
+    printf("Please return issued book before deleting member.\n");
+    return;
+}
 
     members[index].active = 0;
 
     printf("Member deleted successfully.\n");
+}
+
+void memberMenu()
+{
+    int choice;
+
+    do
+    {
+        printf("\n===== MEMBER MANAGEMENT =====\n");
+        printf("1. Add Member\n");
+        printf("2. View Members\n");
+        printf("3. Search Member\n");
+        printf("4. Update Member\n");
+        printf("5. Delete Member\n");
+        printf("6. Back to Main Menu\n");
+
+        printf("Enter your choice: ");
+        scanf("%d", &choice);
+
+        switch (choice)
+        {
+            case 1:
+                addMember();
+                break;
+
+            case 2:
+                viewMembers();
+                break;
+
+            case 3:
+                searchMember();
+                break;
+
+            case 4:
+                updateMember();
+                break;
+
+            case 5:
+                deleteMember();
+                break;
+
+            case 6:
+                printf("Returning to Main Menu...\n");
+                break;
+
+            default:
+                printf("Invalid choice.\n");
+        }
+
+    } while (choice != 6);
 }
