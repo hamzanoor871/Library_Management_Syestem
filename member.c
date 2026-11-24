@@ -69,3 +69,62 @@ void searchMember(void) {
     else printf("ID: %d | Name: %s | Contact: %s\n",
                 members[index].id, members[index].name, members[index].contact);
 }
+void updateMember(void) {
+    int id, index;
+
+    printf("Enter member ID to update: ");
+
+    if (scanf("%d", &id) != 1) {
+        printf("Invalid ID.\n");
+        return;
+    }
+    getchar();
+
+    index = findMemberIndex(id);
+
+    if (index == -1) {
+        printf("Member not found.\n");
+        return;
+    }
+
+    printf("Enter new member name: ");
+    readLine(members[index].name,
+             sizeof(members[index].name));
+
+    printf("Enter new contact: ");
+    readLine(members[index].contact,
+             sizeof(members[index].contact));
+
+    printf("Member updated successfully.\n");
+}
+void deleteMember(void) {
+    int id, index, i;
+
+    printf("Enter member ID to delete: ");
+
+    if (scanf("%d", &id) != 1) {
+        printf("Invalid ID.\n");
+        return;
+    }
+    getchar();
+
+    index = findMemberIndex(id);
+
+    if (index == -1) {
+        printf("Member not found.\n");
+        return;
+    }
+
+    for (i = 0; i < issueCount; i++) {
+        if (issues[i].active &&
+            issues[i].memberId == id) {
+
+            printf("Cannot delete: member has an issued book.\n");
+            return;
+        }
+    }
+
+    members[index].active = 0;
+
+    printf("Member deleted successfully.\n");
+}
