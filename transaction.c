@@ -211,7 +211,7 @@ void returnBook()
 
 void displayIssuedBooks()
 {
-    int transactionID[] = {101, 102, 103, 104};                     //temporary arrays later through file handling things will be stored in arrays
+    int transactionID[] = {101, 102, 103, 104};                   
     int bookID[] = {501, 502, 503, 504};
     int memberID[] = {1001, 1002, 1003, 1004};
     int returned[] = {0, 1, 0, 1};
