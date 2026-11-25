@@ -1,5 +1,4 @@
 
-
 #include <stdio.h>
 #include <string.h>
 #include "book.h"
@@ -18,6 +17,7 @@ int findBookIndex(int id)
     return -1;
 }
 
+/* Check Book */
 int hasBook(int id)
 {
     return findBookIndex(id) != -1;
@@ -34,6 +34,7 @@ void addBook(void)
     }
 
     printf("Enter Book ID: ");
+
     if (scanf("%d", &b.id) != 1)
     {
         printf("Invalid ID.\n");
@@ -58,9 +59,19 @@ void addBook(void)
     b.author[strcspn(b.author, "\n")] = '\0';
 
     printf("Enter Quantity: ");
+
     if (scanf("%d", &b.quantity) != 1 || b.quantity < 0)
     {
         printf("Invalid quantity.\n");
+        while (getchar() != '\n');
+        return;
+    }
+
+    printf("Enter Book Price (Rs.): ");
+
+    if (scanf("%lf", &b.price) != 1 || b.price < 0)
+    {
+        printf("Invalid book price.\n");
         while (getchar() != '\n');
         return;
     }
@@ -87,6 +98,7 @@ void displayBooks(void)
         printf("Book Name: %s\n", books[i].title);
         printf("Author: %s\n", books[i].author);
         printf("Quantity: %d\n", books[i].quantity);
+        printf("Price: Rs. %.2lf\n", books[i].price);
     }
 }
 
@@ -95,6 +107,7 @@ void searchBook(void)
     int id, index;
 
     printf("Enter Book ID to search: ");
+
     if (scanf("%d", &id) != 1)
     {
         printf("Invalid ID.\n");
@@ -115,13 +128,17 @@ void searchBook(void)
     printf("Book Name: %s\n", books[index].title);
     printf("Author: %s\n", books[index].author);
     printf("Quantity: %d\n", books[index].quantity);
+    printf("Price: Rs. %.2lf\n", books[index].price);
 }
 
 void updateBook(void)
 {
     int id, index;
+    double newPrice;
+    int newQuantity;
 
     printf("Enter Book ID to update: ");
+
     if (scanf("%d", &id) != 1)
     {
         printf("Invalid ID.\n");
@@ -140,21 +157,35 @@ void updateBook(void)
     getchar();
 
     printf("Enter new Book Name: ");
-    fgets(books[index].title, sizeof(books[index].title), stdin);
+    fgets(books[index].title,
+          sizeof(books[index].title), stdin);
     books[index].title[strcspn(books[index].title, "\n")] = '\0';
 
     printf("Enter new Author Name: ");
-    fgets(books[index].author, sizeof(books[index].author), stdin);
+    fgets(books[index].author,
+          sizeof(books[index].author), stdin);
     books[index].author[strcspn(books[index].author, "\n")] = '\0';
 
     printf("Enter new Quantity: ");
-    if (scanf("%d", &books[index].quantity) != 1
-        || books[index].quantity < 0)
+
+    if (scanf("%d", &newQuantity) != 1 || newQuantity < 0)
     {
         printf("Invalid quantity.\n");
         while (getchar() != '\n');
         return;
     }
+
+    printf("Enter new Book Price (Rs.): ");
+
+    if (scanf("%lf", &newPrice) != 1 || newPrice < 0)
+    {
+        printf("Invalid book price.\n");
+        while (getchar() != '\n');
+        return;
+    }
+
+    books[index].quantity = newQuantity;
+    books[index].price = newPrice;
 
     printf("Book updated successfully.\n");
 }
@@ -164,6 +195,7 @@ void deleteBook(void)
     int id, index;
 
     printf("Enter Book ID to delete: ");
+
     if (scanf("%d", &id) != 1)
     {
         printf("Invalid ID.\n");
@@ -201,6 +233,7 @@ void checkAvailability(void)
     int id, index;
 
     printf("Enter Book ID: ");
+
     if (scanf("%d", &id) != 1)
     {
         printf("Invalid ID.\n");
@@ -219,14 +252,14 @@ void checkAvailability(void)
     if (books[index].quantity > 0)
     {
         printf("Book is available.\n");
-        printf("Available copies: %d\n", books[index].quantity);
+        printf("Available copies: %d\n",
+               books[index].quantity);
     }
     else
     {
         printf("Book is currently unavailable.\n");
     }
 }
-
 
 void bookMenu(void)
 {
