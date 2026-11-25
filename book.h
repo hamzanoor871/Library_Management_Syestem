@@ -3,12 +3,7 @@
 
 
 
-typedef struct {
-    int id;
-    char title[50];
-    char author[50];
-    int quantity;
-} Book;
+
 
 extern Book books[MAX_BOOKS];
 extern int bookCount;
