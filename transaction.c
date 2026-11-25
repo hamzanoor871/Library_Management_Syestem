@@ -1,44 +1,103 @@
 #include<stdio.h>
+#include "variables.h"
 #define MAX_ATTEMPTS 3
-void isssuebook(){
-    int bookId,memberId,membershipSuggestion,memberExist=0,membershipControl,bookStatus,bookCopies;
-    int orgtransactionDate;
-    const existingBooks;
+#define MAX_TRANSACTIONS 100   
 
-    if(bookId != existingBooks){
+// Additional function 
+int calculateDays(int date);
+int validDate(int date);
+
+void isssuebook(Book books[], int bookCount, Member members[], int memberCount, Transaction transactions[], int *transactionCount){
+    int bookId,memberId,membershipSuggestion,memberExist=0,membershipControl;
+    int orgtransactionDate;
+    int bookIndex = -1;
+    int newTransactionID;
+
+    printf("Enter Book ID: ");
+    scanf("%d",&bookId);
+
+    for(int i = 0; i < bookCount; i++){
+        if(books[i].id == bookId){
+            bookIndex = i;
+            break;
+        }
+    }
+
+    if(bookIndex == -1){
       printf("Book doesn't exist please enter appropiate ID\n ");
     }
     else{
-        if (memberId != memberExist)
+        printf("Enter Member ID: ");
+        scanf("%d",&memberId);
+
+        for(int i = 0; i < memberCount; i++){
+            if(members[i].id == memberId){
+                memberExist = 1;
+                break;
+            }
+        }
+
+        if (memberExist == 0)
         {
             printf("Member ID doesn't exist\n ");
+            printf("We offer three memberships:\n");
+            printf("1. Gold\n");
+            printf("2. Silver\n");
+            printf("3. Bronze\n");
             printf("If you want to become member press 1 or to continue press any key\n");
             scanf("%d",&membershipControl);
             switch (membershipControl){
             case 1:
-                  memberExist=1;
+                  printf("Enter the number of the membership you want (1-3): ");
+                  scanf("%d",&membershipSuggestion);
+                  if(membershipSuggestion < 1 || membershipSuggestion > 3){
+                      printf("Invalid membership choice\n");
+                  }
+                  else{
+                      memberExist=1;
+                  }
+                  break;
             default:
                  memberExist = 0;
                 break;
             }
         }
         else{
-            if(bookStatus){
+            if(books[bookIndex].quantity <= 0){
              printf("Book already issued\n");
             }
+            else if(*transactionCount >= MAX_TRANSACTIONS){
+                printf("Transaction list is full\n");
+            }
             else{
-                printtf("Book issued successfully\n");
-                bookStatus=1;
-                bookCopies = bookCopies - 1;
-                printf("Enter the date today in (yymmdd) : \n");
+                printf("Enter the date today in (yyyymmdd) : \n");
                 scanf("%d",&orgtransactionDate);
-                
 
+                if(!validDate(orgtransactionDate)){
+                    printf("Invalid calendar date.\n");
+                    return;
+                }
+
+                if(*transactionCount == 0){
+                    newTransactionID = 1;
+                }
+                else{
+                    newTransactionID = transactions[*transactionCount - 1].transactionID + 1;
+                }
+
+                transactions[*transactionCount].transactionID = newTransactionID;
+                transactions[*transactionCount].bookID = bookId;
+                transactions[*transactionCount].memberID = memberId;
+                transactions[*transactionCount].issueDate = orgtransactionDate;
+                transactions[*transactionCount].returnDate = 0;
+                transactions[*transactionCount].returned = 0;
+                (*transactionCount)++;
+
+                books[bookIndex].quantity = books[bookIndex].quantity - 1;
+                printf("Book issued successfully\n");
             }
         }
-        
     }
-
 }
 int calculateDays(int date)
 {
@@ -92,33 +151,39 @@ int validDate(int date)
     return 1;
 }
 
-void returnBook()
+void returnBook(Book books[], int bookCount, Member members[], int memberCount, Transaction transactions[], int transactionCount)
 {
-    int transactionID, bookID, memberID;
-    int transactionDate, bookCopies, delayDays, delayPenalty;
-
-    const int existedID;
-    const int existedbookID;
-    const int orgbookTransacationDate;
+    int bookID, memberID;
+    int transactionDate, delayDays, delayPenalty;
 
     int memberID_found = 0;
     int bookID_found = 0;
     int transaction_found = 0;
-    int returned = 0;
+    int alreadyReturned = 0;
+    int bookIndex = -1;
+    int transactionIndex = -1;
 
     for (int i = 1; i <= MAX_ATTEMPTS; i++)
     {
         printf("Enter MemberID: ");
         scanf("%d", &memberID);
 
-        if (memberID != existedID)
+        for (int j = 0; j < memberCount; j++)
+        {
+            if (members[j].id == memberID)
+            {
+                memberID_found = 1;
+                break;
+            }
+        }
+
+        if (memberID_found == 0)
         {
             printf("Error: Member ID doesn't match\n");
             printf("Number of attempts left: %d\n", MAX_ATTEMPTS - i);
         }
         else
         {
-            memberID_found = 1;
             break;
         }
     }
@@ -134,14 +199,23 @@ void returnBook()
         printf("Enter BookID: ");
         scanf("%d", &bookID);
 
-        if (bookID != existedbookID)
+        for (int j = 0; j < bookCount; j++)
+        {
+            if (books[j].id == bookID)
+            {
+                bookID_found = 1;
+                bookIndex = j;
+                break;
+            }
+        }
+
+        if (bookID_found == 0)
         {
             printf("Error: Book ID doesn't match\n");
             printf("Number of attempts left: %d\n", MAX_ATTEMPTS - i);
         }
         else
         {
-            bookID_found = 1;
             break;
         }
     }
@@ -152,20 +226,33 @@ void returnBook()
         return;
     }
 
-    if (memberID == existedID && bookID == existedbookID)
+    for (int i = 0; i < transactionCount; i++)
     {
-        transaction_found = 1;
+        if (transactions[i].memberID == memberID && transactions[i].bookID == bookID)
+        {
+            if (transactions[i].returned == 0)
+            {
+                transaction_found = 1;
+                transactionIndex = i;
+                break;
+            }
+            else
+            {
+                alreadyReturned = 1;
+            }
+        }
     }
 
     if (transaction_found == 0)
     {
-        printf("No matching transaction found.\n");
-        return;
-    }
-
-    if (returned == 1)
-    {
-        printf("This book has already been returned.\n");
+        if (alreadyReturned == 1)
+        {
+            printf("This book has already been returned.\n");
+        }
+        else
+        {
+            printf("No matching transaction found.\n");
+        }
         return;
     }
 
@@ -179,7 +266,7 @@ void returnBook()
     }
 
     delayDays = calculateDays(transactionDate)
-              - calculateDays(orgbookTransacationDate);
+              - calculateDays(transactions[transactionIndex].issueDate);
 
     if (delayDays <= 0)
     {
@@ -203,31 +290,26 @@ void returnBook()
         printf("Late submission fee: Rs. %d\n", delayPenalty);
     }
 
-    returned = 1;
-    bookCopies++;
+    transactions[transactionIndex].returnDate = transactionDate;
+    transactions[transactionIndex].returned = 1;
+    books[bookIndex].quantity++;
 
     printf("Book returned successfully.\n");
 }
 
-void displayIssuedBooks()
+void displayIssuedBooks(Transaction transactions[], int totalTransactions)
 {
-    int transactionID[] = {101, 102, 103, 104};                   
-    int bookID[] = {501, 502, 503, 504};
-    int memberID[] = {1001, 1002, 1003, 1004};
-    int returned[] = {0, 1, 0, 1};
-
-    int totalTransactions = 4;
     int found = 0;
 
     printf("\n---------- Currently Issued Books ----------\n");
 
     for (int i = 0; i < totalTransactions; i++)
     {
-        if (returned[i] == 0)
+        if (transactions[i].returned == 0)
         {
-            printf("\nTransaction ID: %d\n", transactionID[i]);
-            printf("Book ID: %d\n", bookID[i]);
-            printf("Member ID: %d\n", memberID[i]);
+            printf("\nTransaction ID: %d\n", transactions[i].transactionID);
+            printf("Book ID: %d\n", transactions[i].bookID);
+            printf("Member ID: %d\n", transactions[i].memberID);
 
             found = 1;
         }
